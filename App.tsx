@@ -1,59 +1,26 @@
-import * as React from 'react';
-import {NavigationContainer, ParamListBase} from '@react-navigation/native';
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
-import {Text, TouchableHighlight, View} from 'react-native';
-import {useCallback} from 'react';
+import React, {useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import TabNavigation from './src/navigations/TabNavigation';
+import StackNavigation from './src/navigations/StackNavigation';
 
-type RootStackParamList = {
-  Home: undefined;
-  Details: undefined;
-};
-type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
-type DetailsScreenProps = NativeStackScreenProps<ParamListBase, 'Details'>;
-
-const HomeScreen = ({navigation}: HomeScreenProps) => {
-  const onClick = useCallback(() => {
-    navigation.navigate('Details');
-  }, [navigation]);
-
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <TouchableHighlight onPress={onClick}>
-        <Text>Home Screen</Text>
-      </TouchableHighlight>
-    </View>
-  );
+export type LoggedInParamList = {
+  Orders: undefined;
+  Settings: undefined;
+  Delivery: undefined;
+  Complete: {orderId: string};
 };
 
-const DetailsScreen = ({navigation}: DetailsScreenProps) => {
-  const onClick = useCallback(() => {
-    navigation.navigate('Home');
-  }, [navigation]);
-
-  return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <TouchableHighlight onPress={onClick}>
-        <Text>Details Screen</Text>
-      </TouchableHighlight>
-    </View>
-  );
+export type RootStackParamList = {
+  SignIn: undefined;
+  SignUp: undefined;
 };
 
-const Stack = createNativeStackNavigator();
 const App = () => {
+  const [isLoggedIn, setLoggedIn] = useState(false);
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{title: '홈화면'}}
-        />
-        <Stack.Screen name="Details" component={DetailsScreen} />
-      </Stack.Navigator>
+      {isLoggedIn ? <TabNavigation /> : <StackNavigation />}
     </NavigationContainer>
   );
 };
