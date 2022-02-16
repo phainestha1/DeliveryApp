@@ -1,7 +1,7 @@
-import React, {useState} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import TabNavigation from './src/navigations/TabNavigation';
-import StackNavigation from './src/navigations/StackNavigation';
+import React from 'react';
+import {Provider} from 'react-redux';
+import store from './src/store';
+import Root from './src/navigations/Root';
 
 export type LoggedInParamList = {
   Orders: undefined;
@@ -16,12 +16,10 @@ export type RootStackParamList = {
 };
 
 const App = () => {
-  const [isLoggedIn, setLoggedIn] = useState(false);
-
   return (
-    <NavigationContainer>
-      {isLoggedIn ? <TabNavigation /> : <StackNavigation />}
-    </NavigationContainer>
+    <Provider store={store}>
+      <Root />
+    </Provider>
   );
 };
 

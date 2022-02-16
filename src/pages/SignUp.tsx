@@ -1,11 +1,16 @@
-import React, {useCallback, useRef, useState} from 'react';
-import {Alert} from 'react-native';
-import styled from 'styled-components/native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import axios, {AxiosError} from 'axios';
+import React, {useCallback, useRef, useState} from 'react';
+import {ActivityIndicator, Alert} from 'react-native';
+import Config from 'react-native-config';
+import styled from 'styled-components/native';
 import {RootStackParamList} from '../../App';
 import DismissKeyboardView from '../components/DismissKeyboardView';
 
-const SignUp = () => {
+type SignUpScreenProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
+
+const SignUp = ({navigation}: SignUpScreenProps) => {
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -23,7 +28,33 @@ const SignUp = () => {
     setPassword(text);
   }, []);
 
+  const sendUserData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${Config.API_URL}/user`,
+        {email, name, password},
+        {
+          headers: {
+            token: '고유한 값',
+          },
+        },
+      );
+      console.log(response);
+      Alert.alert('알림', '회원가입이 완료되었습니다.');
+      navigation.navigate('SignIn');
+    } catch (error) {
+      const errorResponse = (error as AxiosError).response;
+      if (errorResponse) Alert.alert('알림', errorResponse.data.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onSubmit = useCallback(() => {
+    if (loading) {
+      return;
+    }
     if (!email || !email.trim()) {
       return Alert.alert('알림', '이메일을 입력해주세요.');
     }
@@ -46,9 +77,9 @@ const SignUp = () => {
         '비밀번호는 영문,숫자,특수문자($@^!%*#?&)를 모두 포함하여 8자 이상 입력해야합니다.',
       );
     }
-    console.log(email, name, password);
+    sendUserData();
     Alert.alert('알림', '회원가입 되었습니다.');
-  }, [email, name, password]);
+  }, [loading, email, name, password]);
 
   const userInfoRecorded = email && password && name;
 
@@ -109,11 +140,16 @@ const SignUp = () => {
       <BtnView>
         <SignUpBtn
           onPress={onSubmit}
-          disabled={!userInfoRecorded}
+          // 광클 금지
+          disabled={!userInfoRecorded || loading}
           style={{
             backgroundColor: !userInfoRecorded ? 'gray' : 'blue',
           }}>
-          <LoginText>회원가입</LoginText>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <LoginText>회원가입</LoginText>
+          )}
         </SignUpBtn>
       </BtnView>
     </DismissKeyboardView>
