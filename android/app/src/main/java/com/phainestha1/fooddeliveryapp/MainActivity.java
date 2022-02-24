@@ -1,4 +1,4 @@
-package com.fooddeliveryapp;
+package com.phainestha1.fooddeliveryapp;
 
 import com.facebook.react.ReactActivity;
 

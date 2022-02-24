@@ -12,6 +12,7 @@ import {Alert} from 'react-native';
 import axios, {AxiosError} from 'axios';
 import {useAppDispatch} from '../store';
 import orderSlice from '../slices/order';
+import usePermissions from '../hooks/usePermissions';
 
 export type LoggedInParamList = {
   Orders: undefined;
@@ -25,6 +26,8 @@ const Root = () => {
   const isLoggedIn = useSelector((state: RootState) => !!state.user.email);
   const dispatch = useAppDispatch();
   const [socket, disconnect] = useSocket();
+
+  usePermissions();
 
   useEffect(() => {
     axios.interceptors.response.use(
